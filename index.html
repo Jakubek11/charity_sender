@@ -8,71 +8,94 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, #02161e, #000000);
-  color: #e9feff;
+  background: linear-gradient(180deg, #e0f7ff, #c9fffa, #ffffff);
+  color: #003d44;
   text-align: center;
   padding: 40px;
 }
 
-/* Logo */
+/* OP_NET LOGO */
 .logo {
   width: 90px;
   margin-bottom: 20px;
-  filter: drop-shadow(0 0 10px #00eaff);
+  filter: drop-shadow(0 0 8px #00eaff);
 }
 
-/* Main box */
+/* MAIN BOX */
 .box {
-  background: #00141a;
+  background: #ffffffcc;
+  backdrop-filter: blur(4px);
   padding: 25px;
   border-radius: 12px;
   width: 380px;
   margin: auto;
-  box-shadow: 0 0 25px #00eaff25;
-  border: 1px solid #004050;
+  box-shadow: 0 0 20px #00aab030;
+  border: 1px solid #a0e4ea;
 }
 
+/* inputs + select */
 select, input {
   width: 90%;
   padding: 12px;
   margin-top: 12px;
   border-radius: 6px;
-  border: none;
-  background: #000c10;
-  color: #00eaff;
+  border: 1px solid #88dbe0;
+  background: #ffffff;
+  color: #005b63;
   font-size: 16px;
 }
 
-button {
+/* preset buttons */
+.preset-box {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.preset-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #00eaff;
+  border: none;
+  color: #003d44;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+.preset-btn:hover { background: #4df6ff; }
+
+/* main buttons */
+button.send, button.validate {
   margin-top: 15px;
   padding: 12px 20px;
   background: #00eaff;
   border: none;
-  color: #00363e;
+  color: #003d44;
   font-weight: bold;
   cursor: pointer;
   border-radius: 6px;
   width: 92%;
   font-size: 16px;
 }
-button:hover { background: #4df6ff; }
+button.send:hover, button.validate:hover { background: #4df6ff; }
 
+/* small messages */
 .msg {
   min-height: 20px;
   margin-top: 15px;
-  color: #b8ffff;
+  color: #007f8a;
   font-size: 14px;
 }
 
-/* Progress bar */
+/* PROGRESS BAR */
 .progress {
   width: 100%;
-  background: #00333d;
+  background: #bff3f6;
   border-radius: 4px;
   height: 10px;
   margin-top: 20px;
 }
-
 .bar {
   height: 10px;
   background: #00eaff;
@@ -80,23 +103,44 @@ button:hover { background: #4df6ff; }
   border-radius: 4px;
   transition: width 1s ease-out;
 }
+
+/* POPUP */
+.popup {
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffffdd;
+  padding: 20px 30px;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #007f8a;
+  box-shadow: 0 0 20px #00eaff55;
+  display: none;
+  animation: fade 0.5s ease-out;
+}
+@keyframes fade {
+  from { opacity: 0; transform: translate(-50%, -60%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
 </style>
 </head>
 
 <body>
 
-<!-- Simple OP_NET icon (SVG) -->
+<!-- OP_NET LOGO -->
 <svg class="logo" viewBox="0 0 100 100">
   <circle cx="50" cy="50" r="40" stroke="#00eaff" stroke-width="6" fill="none"/>
   <circle cx="50" cy="50" r="25" stroke="#00eaff" stroke-width="4" fill="none" stroke-dasharray="8 6"/>
 </svg>
 
-<h1 style="color:#00eaff;">OP_NET Charity Sender</h1>
-<p>Choose a charity → adjust BTC address → enter amount → Send BTC.</p>
+<h1 style="color:#005b63;">OP_NET Charity Sender</h1>
+<p>Select a charity → adjust BTC address → pick amount → Send BTC</p>
 
 <div class="box">
 
-  <!-- Charity selector -->
+  <!-- CHOOSE ORGANIZATION -->
   <select id="org" onchange="updateAddress()">
     <option value="clean">Clean Water Fund</option>
     <option value="forest">Save the Forest</option>
@@ -105,23 +149,33 @@ button:hover { background: #4df6ff; }
     <option value="edu">Open Education Foundation</option>
   </select>
 
-  <!-- BTC address (auto-filled, editable) -->
-  <input id="addr" placeholder="BTC address (auto-filled)" />
+  <!-- BTC ADDRESS -->
+  <input id="addr" placeholder="BTC address will appear here..." />
 
-  <!-- Amount -->
+  <!-- AMOUNT -->
   <input id="amt" type="number" step="0.00000001" placeholder="Amount BTC" />
 
-  <!-- Buttons -->
-  <button onclick="validateAddr()">Validate Address</button>
-  <button onclick="sendBTC()">Send BTC</button>
+  <!-- PRESET AMOUNTS -->
+  <div class="preset-box">
+    <button class="preset-btn" onclick="setAmount(0.0001)">0.0001</button>
+    <button class="preset-btn" onclick="setAmount(0.0002)">0.0002</button>
+    <button class="preset-btn" onclick="setAmount(0.0005)">0.0005</button>
+  </div>
 
+  <!-- ACTION BUTTONS -->
+  <button class="validate" onclick="validateAddr()">Validate Address</button>
+  <button class="send" onclick="sendBTC()">Send BTC</button>
+
+  <!-- PROGRESS BAR -->
   <div class="progress"><div id="bar" class="bar"></div></div>
 
   <p id="msg" class="msg"></p>
 </div>
 
+<!-- POPUP -->
+<div id="popup" class="popup">Thank you! ❤️</div>
+
 <script>
-// Default BTC addresses (fictional!)
 const charityAddresses = {
   clean:  "bc1qcleanfund00000000000000000000000",
   forest: "bc1qforesthelp000000000000000000000",
@@ -130,10 +184,8 @@ const charityAddresses = {
   edu:    "bc1qeducation000000000000000000000"
 };
 
-// Set initial address
 window.onload = () => updateAddress();
 
-// Automatically update BTC address when selecting org
 function updateAddress(){
   const orgKey = document.getElementById('org').value;
   document.getElementById('addr').value = charityAddresses[orgKey];
@@ -141,7 +193,6 @@ function updateAddress(){
   bar(20);
 }
 
-// Validation
 function validateAddr(){
   const a = document.getElementById('addr').value.trim();
   const reg = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{20,}$/;
@@ -157,7 +208,12 @@ function validateAddr(){
   }
 }
 
-// Send BTC (BIP21)
+function setAmount(x){
+  document.getElementById('amt').value = x;
+  msg("Amount set.");
+  bar(40);
+}
+
 function sendBTC(){
   if(!validateAddr()) return;
 
@@ -169,6 +225,9 @@ function sendBTC(){
     return;
   }
 
+  // show popup
+  showPopup();
+
   const link = `bitcoin:${a}?amount=${amt}`;
   msg("Opening wallet…");
   bar(100);
@@ -176,9 +235,19 @@ function sendBTC(){
   window.location.href = link;
 }
 
-// Helpers
-function msg(t){ document.getElementById('msg').innerHTML = t; }
-function bar(p){ document.getElementById('bar').style.width = p + "%"; }
+function showPopup(){
+  const p = document.getElementById("popup");
+  p.style.display = "block";
+  setTimeout(() => { p.style.display = "none"; }, 2000);
+}
+
+function msg(t){
+  document.getElementById('msg').innerHTML = t;
+}
+
+function bar(p){
+  document.getElementById('bar').style.width = p + "%";
+}
 </script>
 
 </body>
