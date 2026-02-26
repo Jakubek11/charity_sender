@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OP_NET Charity Sender</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #02161e, #000000);
+  color: #e9feff;
+  text-align: center;
+  padding: 40px;
+}
+
+/* Logo */
+.logo {
+  width: 90px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px #00eaff);
+}
+
+/* Main box */
+.box {
+  background: #00141a;
+  padding: 25px;
+  border-radius: 12px;
+  width: 380px;
+  margin: auto;
+  box-shadow: 0 0 25px #00eaff25;
+  border: 1px solid #004050;
+}
+
+select, input {
+  width: 90%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #000c10;
+  color: #00eaff;
+  font-size: 16px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: #00eaff;
+  border: none;
+  color: #00363e;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 92%;
+  font-size: 16px;
+}
+button:hover { background: #4df6ff; }
+
+.msg {
+  min-height: 20px;
+  margin-top: 15px;
+  color: #b8ffff;
+  font-size: 14px;
+}
+
+/* Progress bar */
+.progress {
+  width: 100%;
+  background: #00333d;
+  border-radius: 4px;
+  height: 10px;
+  margin-top: 20px;
+}
+
+.bar {
+  height: 10px;
+  background: #00eaff;
+  width: 0%;
+  border-radius: 4px;
+  transition: width 1s ease-out;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Simple OP_NET icon (SVG) -->
+<svg class="logo" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="40" stroke="#00eaff" stroke-width="6" fill="none"/>
+  <circle cx="50" cy="50" r="25" stroke="#00eaff" stroke-width="4" fill="none" stroke-dasharray="8 6"/>
+</svg>
+
+<h1 style="color:#00eaff;">OP_NET Charity Sender</h1>
+<p>Choose a charity → adjust BTC address → enter amount → Send BTC.</p>
+
+<div class="box">
+
+  <!-- Charity selector -->
+  <select id="org" onchange="updateAddress()">
+    <option value="clean">Clean Water Fund</option>
+    <option value="forest">Save the Forest</option>
+    <option value="ocean">Ocean Cleanup Initiative</option>
+    <option value="animal">Animal Rescue Network</option>
+    <option value="edu">Open Education Foundation</option>
+  </select>
+
+  <!-- BTC address (auto-filled, editable) -->
+  <input id="addr" placeholder="BTC address (auto-filled)" />
+
+  <!-- Amount -->
+  <input id="amt" type="number" step="0.00000001" placeholder="Amount BTC" />
+
+  <!-- Buttons -->
+  <button onclick="validateAddr()">Validate Address</button>
+  <button onclick="sendBTC()">Send BTC</button>
+
+  <div class="progress"><div id="bar" class="bar"></div></div>
+
+  <p id="msg" class="msg"></p>
+</div>
+
+<script>
+// Default BTC addresses (fictional!)
+const charityAddresses = {
+  clean:  "bc1qcleanfund00000000000000000000000",
+  forest: "bc1qforesthelp000000000000000000000",
+  ocean:  "bc1qoceanfix00000000000000000000000",
+  animal: "bc1qanimalcare00000000000000000000",
+  edu:    "bc1qeducation000000000000000000000"
+};
+
+// Set initial address
+window.onload = () => updateAddress();
+
+// Automatically update BTC address when selecting org
+function updateAddress(){
+  const orgKey = document.getElementById('org').value;
+  document.getElementById('addr').value = charityAddresses[orgKey];
+  msg("Address updated.");
+  bar(20);
+}
+
+// Validation
+function validateAddr(){
+  const a = document.getElementById('addr').value.trim();
+  const reg = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{20,}$/;
+
+  if(reg.test(a)){
+    msg("✔ Valid BTC Address");
+    bar(50);
+    return true;
+  } else {
+    msg("❌ Invalid BTC Address");
+    bar(0);
+    return false;
+  }
+}
+
+// Send BTC (BIP21)
+function sendBTC(){
+  if(!validateAddr()) return;
+
+  const a = document.getElementById('addr').value.trim();
+  const amt = document.getElementById('amt').value.trim();
+
+  if(!amt || parseFloat(amt) <= 0){
+    msg("Enter a valid amount.");
+    return;
+  }
+
+  const link = `bitcoin:${a}?amount=${amt}`;
+  msg("Opening wallet…");
+  bar(100);
+
+  window.location.href = link;
+}
+
+// Helpers
+function msg(t){ document.getElementById('msg').innerHTML = t; }
+function bar(p){ document.getElementById('bar').style.width = p + "%"; }
+</script>
+
+</body>
+</html>
