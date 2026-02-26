@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>OP_NET Charity Sender</title>
+<title>Charity Sender on OpNet</title>
 
 <style>
 body {
@@ -12,13 +12,6 @@ body {
   color: #003d44;
   text-align: center;
   padding: 40px;
-}
-
-/* OP_NET LOGO */
-.logo {
-  width: 90px;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 8px #00eaff);
 }
 
 /* MAIN BOX */
@@ -129,14 +122,7 @@ button.send:hover, button.validate:hover { background: #4df6ff; }
 
 <body>
 
-<!-- OP_NET LOGO -->
-<svg class="logo" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="40" stroke="#00eaff" stroke-width="6" fill="none"/>
-  <circle cx="50" cy="50" r="25" stroke="#00eaff" stroke-width="4" fill="none" stroke-dasharray="8 6"/>
-</svg>
-
-<h1 style="color:#005b63;">OP_NET Charity Sender</h1>
-<p>Select a charity → adjust BTC address → pick amount → Send BTC</p>
+<h1 style="color:#005b63;">Charity Sender on OpNet</h1>
 
 <div class="box">
 
@@ -225,7 +211,6 @@ function sendBTC(){
     return;
   }
 
-  // show popup
   showPopup();
 
   const link = `bitcoin:${a}?amount=${amt}`;
@@ -241,13 +226,8 @@ function showPopup(){
   setTimeout(() => { p.style.display = "none"; }, 2000);
 }
 
-function msg(t){
-  document.getElementById('msg').innerHTML = t;
-}
-
-function bar(p){
-  document.getElementById('bar').style.width = p + "%";
-}
+function msg(t){ document.getElementById('msg').innerHTML = t; }
+function bar(p){ document.getElementById('bar').style.width = p + "%"; }
 </script>
 
 </body>
